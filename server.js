@@ -1,8 +1,8 @@
 export default async function handler(req, res) {
-  const VERSION = "v14";
+  const VERSION = "v15";
 
   // --- CORS headers ---
-  res.setHeader("Access-Control-Allow-Origin", "*"); // you can restrict to your domain if you want
+  res.setHeader("Access-Control-Allow-Origin", "*"); // or restrict to your domain
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
@@ -25,15 +25,21 @@ export default async function handler(req, res) {
     const userMessage = req.body.message || "";
     console.log(`[${VERSION}] /chat called with: "${userMessage}"`);
 
-    // Quick keyword redirect
-    const financialKeywords = [
-      "investment", "retirement", "tax", "insurance", "mortgage",
-      "wealth", "budget", "currency", "finance", "financial"
+    // Expanded compliance keywords
+    const complianceKeywords = [
+      "investment", "invest", "portfolio", "stocks", "bonds", "mutual fund",
+      "etf", "retirement", "ira", "401k", "pension", "tax", "insurance",
+      "mortgage", "wealth", "budget", "currency", "finance", "financial",
+      "advisor", "planning", "savings", "risk", "hedge", "capital"
     ];
-    if (financialKeywords.some(k => userMessage.toLowerCase().includes(k))) {
-      console.log(`[${VERSION}] financial keyword detected`);
+
+    if (complianceKeywords.some(k => userMessage.toLowerCase().includes(k))) {
+      console.log(`[${VERSION}] compliance keyword detected`);
       return res.json({
-        reply: "I recommend contacting Aliya Financial to schedule a consultation for personalized cross-border financial guidance."
+        reply:
+          "Aliya Buddy cannot provide financial, tax, or investment advice. " +
+          "For personalized guidance, please [schedule a free consultation with Aliya Financial](https://aliyabrd-s23wab.manus.space/). " +
+          "Educational content only. Not legal, tax, or investment advice. Investing involves risk."
       });
     }
 
@@ -61,12 +67,13 @@ export default async function handler(req, res) {
                 "You are Aliya Buddy, a warm, knowledgeable assistant helping people navigate the journey of making Aliyah to Israel. " +
                 "Keep your answers short, clear, and conversational — 2 to 4 sentences max. " +
                 "Focus on being friendly and practical, like a chat with a helpful friend. " +
-                "If you don’t know something, say so honestly and suggest where to look."
+                "If you don’t know something, say so honestly and suggest where to look. " +
+                "Do not provide financial, tax, or investment advice — instead, direct users to schedule a consultation with Aliya Financial."
             },
             { role: "user", content: userMessage }
           ],
           temperature: 0.7,
-          max_tokens: 150 // 👈 ensures short, chat-style replies
+          max_tokens: 150 // ensures short, chat-style replies
         })
       });
 
