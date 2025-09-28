@@ -1,8 +1,8 @@
 export default async function handler(req, res) {
-  const VERSION = "v13";
+  const VERSION = "v14";
 
   // --- CORS headers ---
-  res.setHeader("Access-Control-Allow-Origin", "*"); // or restrict to your domain
+  res.setHeader("Access-Control-Allow-Origin", "*"); // you can restrict to your domain if you want
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     if (financialKeywords.some(k => userMessage.toLowerCase().includes(k))) {
       console.log(`[${VERSION}] financial keyword detected`);
       return res.json({
-        reply: "I recommend contacting Aliya Financial to schedule a consultation for personalized financial guidance."
+        reply: "I recommend contacting Aliya Financial to schedule a consultation for personalized cross-border financial guidance."
       });
     }
 
@@ -57,10 +57,16 @@ export default async function handler(req, res) {
           messages: [
             {
               role: "system",
-              content: "You are Aliya Buddy, a warm, knowledgeable assistant who helps people with Aliyah to Israel."
+              content:
+                "You are Aliya Buddy, a warm, knowledgeable assistant helping people navigate the journey of making Aliyah to Israel. " +
+                "Keep your answers short, clear, and conversational — 2 to 4 sentences max. " +
+                "Focus on being friendly and practical, like a chat with a helpful friend. " +
+                "If you don’t know something, say so honestly and suggest where to look."
             },
             { role: "user", content: userMessage }
-          ]
+          ],
+          temperature: 0.7,
+          max_tokens: 150 // 👈 ensures short, chat-style replies
         })
       });
 
@@ -73,7 +79,7 @@ export default async function handler(req, res) {
       }
 
       const data = JSON.parse(raw);
-      const reply = data?.choices?.[0]?.message?.content || "";
+      const reply = data?.choices?.[0]?.message?.content?.trim() || "";
       return res.json({ reply });
     } catch (error) {
       console.error(`[${VERSION}] ❌ Unexpected error:`, error);
