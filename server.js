@@ -1,13 +1,25 @@
 export default async function handler(req, res) {
-  const VERSION = "v11";
+  const VERSION = "v12";
 
-  if (req.method !== "POST") {
+  // Health check route
+  if (req.method === "GET" && req.url === "/health") {
+    return res.status(200).json({
+      version: VERSION,
+      ok: true,
+      node: process.version,
+      hasKey: !!process.env.OPENAI_API_KEY
+    });
+  }
+
+  // Only allow POST for /chat
+  if (req.method !== "POST" || req.url !== "/chat") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const userMessage = req.body.message || "";
   console.log(`[${VERSION}] /chat called with: "${userMessage}"`);
 
+  // Quick keyword redirect
   const financialKeywords = [
     "investment", "retirement", "tax", "insurance", "mortgage",
     "wealth", "budget", "currency", "finance", "financial"
@@ -37,7 +49,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "You are Aliya Buddy, a warm, knowledgeable assistant who helps people with Aliyah to Israel." },
+          {
+            role: "system",
+            content: "You are Aliya Buddy, a warm, knowledgeable assistant who helps people with Aliyah to Israel."
+          },
           { role: "user", content: userMessage }
         ]
       })
