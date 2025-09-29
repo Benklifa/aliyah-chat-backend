@@ -43,7 +43,7 @@ function pickFollowUp(userMessage) {
 }
 
 export default async function handler(req, res) {
-  const VERSION = "v22";
+  const VERSION = "v23";
 
   // --- CORS headers ---
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -139,7 +139,10 @@ export default async function handler(req, res) {
       const data = JSON.parse(raw);
       let reply = data?.choices?.[0]?.message?.content?.trim() || "";
 
-      // --- Append trusted sources if relevant ---
+      // --- Check if model already ended with a question BEFORE appending sources ---
+      const modelEndedWithQuestion = reply.trim().endsWith("?");
+
+      // Append trusted sources if relevant
       if (userMessage.toLowerCase().includes("community")) {
         reply += ` You can also explore more on [Nefesh B’Nefesh’s community guide](${resourceLinks.nbn}).`;
       }
@@ -151,14 +154,12 @@ export default async function handler(req, res) {
       }
 
       // --- Guarantee exactly ONE follow-up ---
-      const trimmed = reply.trim();
-      if (!trimmed.endsWith("?")) {
+      if (!modelEndedWithQuestion) {
         const followUp = pickFollowUp(userMessage);
         reply += " " + followUp;
         pendingOffer = followUp;
       } else {
-        // Model already ended with a question → don’t add another
-        pendingOffer = trimmed;
+        pendingOffer = reply;
       }
 
       return res.json({ reply });
