@@ -43,7 +43,7 @@ function pickFollowUp(userMessage) {
 }
 
 export default async function handler(req, res) {
-  const VERSION = "v21";
+  const VERSION = "v22";
 
   // --- CORS headers ---
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -139,7 +139,7 @@ export default async function handler(req, res) {
       const data = JSON.parse(raw);
       let reply = data?.choices?.[0]?.message?.content?.trim() || "";
 
-      // --- Post-processing: append trusted sources ---
+      // --- Append trusted sources if relevant ---
       if (userMessage.toLowerCase().includes("community")) {
         reply += ` You can also explore more on [Nefesh B’Nefesh’s community guide](${resourceLinks.nbn}).`;
       }
@@ -150,13 +150,15 @@ export default async function handler(req, res) {
         reply += ` Official details are available on the [Israeli government Aliyah portal](${resourceLinks.government}).`;
       }
 
-      // --- Guarantee follow-up question ---
-      if (!reply.endsWith("?")) {
+      // --- Guarantee exactly ONE follow-up ---
+      const trimmed = reply.trim();
+      if (!trimmed.endsWith("?")) {
         const followUp = pickFollowUp(userMessage);
         reply += " " + followUp;
         pendingOffer = followUp;
       } else {
-        pendingOffer = reply;
+        // Model already ended with a question → don’t add another
+        pendingOffer = trimmed;
       }
 
       return res.json({ reply });
