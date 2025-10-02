@@ -7,7 +7,7 @@ const resourceLinks = {
   government: "https://www.gov.il/en/departments/immigration_and_absorption",
   nbn: "https://www.nbn.org.il/aliyahpedia/",
   numbeo: "https://www.numbeo.com/cost-of-living/",
-  finance: "https://aliyabrd-s23wab.manus.space/"
+  finance: "https://aliyafinancial.com/contact"   // ✅ updated link
 };
 
 // --- Follow-up library ---
