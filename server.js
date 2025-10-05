@@ -80,9 +80,8 @@ export default async function handler(req, res) {
     // --- Compliance guardrails ---
     const complianceKeywords = [
       "investment", "invest", "portfolio", "stocks", "bonds", "mutual fund",
-      "etf", "retirement", "ira", "401k", "pension", "tax", "insurance",
-      "mortgage", "wealth", "budget", "currency", "finance", "financial",
-      "advisor", "planning", "savings", "risk", "hedge", "capital"
+      "etf", "retirement", "ira", "401k", "pension", "tax", "insurance", "finance", "financial",
+      "advisor", "planning", "risk", "hedge", "capital"
     ];
 
     if (complianceKeywords.some(k => userMessage.toLowerCase().includes(k))) {
